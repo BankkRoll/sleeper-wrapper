@@ -3,7 +3,7 @@ import { handleApiError } from '../../errors/ApiErrors';
 
 export interface UserResponse {
   username: string;
-  userId: string;
+  user_id: string;
   displayName: string;
   avatar: string;
 }

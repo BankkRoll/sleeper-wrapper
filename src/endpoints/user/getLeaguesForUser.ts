@@ -2,7 +2,6 @@ import axios from 'axios';
 import { handleApiError } from '../../errors/ApiErrors';
 
 export interface League {
-  [x: string]: Key | null | undefined;
   total_rosters: number;
   status: string;
   sport: string;
