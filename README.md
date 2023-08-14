@@ -12,6 +12,7 @@ Sleeper Wrapper is an NPM package that offers a seamless integration with the Sl
   - [Players](#players)
   - [Transactions](#transactions)
   - [NFL State](#nfl-state)
+- [Example](#example)
 - [File Directory](#file-directory)
 - [Errors](#errors)
 - [Contributing](#contributing)
@@ -71,6 +72,85 @@ npm install sleeper-wrapper
 | `getNFLState`                 | Returns information about the current state for any sport. | `const state = await getNFLState();` |
 
 
+## Example
+
+```ts
+import { useState, useEffect } from 'react';
+import { fetchUser, fetchAvatarFullSizeUrl, fetchAvatarThumbnailUrl, getLeaguesForUser } from 'sleeper-wrapper';
+import { UserResponse } from 'sleeper-wrapper/dist/endpoints/user/fetchUser';
+
+interface UserData {
+  username: string;
+  user_id: string;
+  displayName: string;
+  avatar: string;
+}
+
+interface LeagueData {
+  league_id: string;
+  name: string;
+}
+
+const UserProfile = () => {
+  const [user, setUser] = useState<UserData | null>(null);
+  const [leagues, setLeagues] = useState<LeagueData[]>([]);
+  const username = 'INPUT_YOUR_USERNAME_HERE';
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const userData: UserResponse = await fetchUser(username);
+        setUser(userData);
+      } catch (error) {
+        console.error('Error fetching user:', error);
+      }
+    };
+
+    fetchUserData();
+  }, [username]);
+
+  useEffect(() => {
+    const fetchUserLeagues = async () => {
+      try {
+        if (user) {
+          const fetchedLeagues = await getLeaguesForUser(user.user_id, 'nfl', '2023');
+          setLeagues(fetchedLeagues);
+        }
+      } catch (error) {
+        console.error('Error fetching leagues:', error);
+      }
+    };
+
+    if (user) {
+      fetchUserLeagues();
+    }
+  }, [user]);
+
+  return (
+    <div>
+      {user ? (
+        <div>
+          <p>Display Name: {user.displayName}</p>
+          <p>Username: {user.username}</p>
+          <p>User ID: {user.user_id}</p>
+          <img src={fetchAvatarFullSizeUrl(user.avatar)} alt="Avatar" />
+          <img src={fetchAvatarThumbnailUrl(user.avatar)} alt="Avatar" />
+          <p>Leagues:</p>
+          {leagues.map((league) => (
+            <p key={league.league_id}>{league.name}</p>
+          ))}
+        </div>
+      ) : (
+        <p>Loading...</p>
+      )}
+    </div>
+  );
+};
+
+export default UserProfile;
+```
+
+
 ## File Directory
 
 ```plaintext
@@ -104,4 +184,4 @@ Feel free to fork the repository, make changes, and submit pull requests. If you
 
 ## License
 
-This project is licensed under the MIT (License)[/license].
+This project is licensed under the MIT [License](./license).
